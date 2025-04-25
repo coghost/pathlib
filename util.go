@@ -245,14 +245,14 @@ func IsJSON(data []byte) bool {
 //
 // Note: This function will only include fields that would be marshaled to JSON.
 // Unexported fields and fields with `json:"-"` tags will be omitted.
-func StructToJSONMap(src interface{}) (map[string]interface{}, error) {
+func StructToJSONMap(src any) (map[string]any, error) {
 	jsonData, err := json.Marshal(src)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal struct to JSON: %w", err)
 	}
 
 	// Then unmarshal the JSON to a map
-	var result map[string]interface{}
+	var result map[string]any
 
 	err = json.Unmarshal(jsonData, &result)
 	if err != nil {
@@ -290,7 +290,7 @@ func StructToJSONMap(src interface{}) (map[string]interface{}, error) {
 //
 // Note: This function relies on the `omitempty` tag for fields that should be
 // removed when empty. Make sure your struct is properly tagged for the desired behavior.
-func SanitizeJSON(rawJSON string, template interface{}) ([]byte, error) {
+func SanitizeJSON(rawJSON string, template any) ([]byte, error) {
 	// Unmarshal raw JSON into the provided struct template
 	if err := json.Unmarshal([]byte(rawJSON), template); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)

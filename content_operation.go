@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strings"
 
+	"github.com/goccy/go-yaml"
 	"github.com/spf13/afero"
 )
 
@@ -128,6 +130,21 @@ func (p *FsPath) MustGetLines() []string {
 	return lines
 }
 
+// GetShuffleLines reads the file return its contents as a slice of shuffled strings
+func (p *FsPath) GetShuffleLines() ([]string, error) {
+	lines, err := p.GetLines()
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range lines {
+		j := rand.Intn(i + 1)
+		lines[i], lines[j] = lines[j], lines[i]
+	}
+
+	return lines, nil
+}
+
 // GetJSON reads the file and unmarshals its content into the provided interface.
 //
 // This method reads the entire file content using GetBytes, then uses json.Unmarshal
@@ -155,13 +172,13 @@ func (p *FsPath) MustGetLines() []string {
 //
 // Note: This method reads the entire file into memory. For very large files,
 // consider using a streaming JSON parser instead.
-func (p *FsPath) GetJSON(raw interface{}) error {
+func (p *FsPath) GetJSON(v any) error {
 	data, err := p.GetBytes()
 	if err != nil {
 		return err
 	}
 
-	return json.Unmarshal(data, raw)
+	return json.Unmarshal(data, v)
 }
 
 // MustGetJSON reads the file, unmarshals its content into the provided interface, and panics on error.
@@ -184,8 +201,22 @@ func (p *FsPath) GetJSON(raw interface{}) error {
 //
 // Note: Use this method only when you're sure the file exists and contains valid JSON,
 // or if you want to halt execution on error.
-func (p *FsPath) MustGetJSON(v interface{}) {
+func (p *FsPath) MustGetJSON(v any) {
 	p.e(p.GetJSON(v))
+}
+
+// GetYaml similar as GetJSON, but unmarshal with Yaml
+func (p *FsPath) GetYaml(v any) error {
+	data, err := p.GetBytes()
+	if err != nil {
+		return err
+	}
+
+	return yaml.Unmarshal(data, &v)
+}
+
+func (p *FsPath) MustGetYaml(v any) {
+	p.e(p.GetYaml(v))
 }
 
 // Reader returns an io.Reader for the file

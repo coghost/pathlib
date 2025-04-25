@@ -194,7 +194,7 @@ func (p *FsPath) Suffixes() []string {
 // Example:
 //
 //	p.e(someFunction())  // panics if someFunction returns an error
-func (p *FsPath) e(args ...interface{}) {
+func (p *FsPath) e(args ...any) {
 	err, ok := args[len(args)-1].(error)
 	if ok {
 		panic(err)
