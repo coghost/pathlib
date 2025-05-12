@@ -212,7 +212,7 @@ func (p *FsPath) GetYaml(v any) error {
 		return err
 	}
 
-	return yaml.Unmarshal(data, &v)
+	return yaml.Unmarshal(data, v)
 }
 
 func (p *FsPath) MustGetYaml(v any) {
